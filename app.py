@@ -303,7 +303,7 @@ def home():
 
     if not user_data or not user_data[0] or not user_data[1]:
         flash("Please update your profile with your birth date to get your horoscope.", "warning")
-        return redirect(url_for('profile'))  # Redirect to a profile update page if missing
+        return redirect(url_for('aboutme'))  # Redirect to a profile update page if missing
 
     birth_month, birth_day = user_data
     zodiac_sign = get_horoscope_sign(birth_month, birth_day)
