@@ -1,0 +1,9 @@
+Flask
+mysql-connector-python
+spotipy
+requests
+Pillow
+python-dotenv
+werkzeug
+gunicorn  # Required for deployment on Render
+
