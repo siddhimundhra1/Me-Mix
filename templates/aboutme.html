@@ -19,9 +19,20 @@
 </head>
 <body>
     <h1>{{username}}</h1>
+    <p>Birthday: {{month}}/{{day}}/{{year}}.</p>
     <form action="/update_bio" method="POST">
         <textarea name="bio" rows="4" cols="50">{{ bio }}</textarea><br>
-        <button type="submit">Update Bio</button>
+        <button type="submit">Update Your Bio</button>
+    </form>
+    <p>Type in your news interests seperated by double semi-colons (";;").</p>
+    <form action="/update_news" method="POST">
+        <textarea name="news_interests" rows="4" cols="50">{{ news_interests }}</textarea><br>
+        <button type="submit">Update Your News Interests</button>
+    </form>
+    <p>Type in your favorite shows and movies seperated by double semi-colons (";;").</p>
+    <form action="/update_shows" method="POST">
+        <textarea name="favorite_shows_movies" rows="4" cols="50">{{ favorite_shows_movies }}</textarea><br>
+        <button type="submit">Update Your Favorite Shows and Movies</button>
     </form>
     <a href="/logout"><p style="text-align:center">Logout</p></a>
     

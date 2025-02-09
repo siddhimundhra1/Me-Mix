@@ -43,54 +43,68 @@ db = mysql.connector.connect(
 
 cursor = db.cursor()
 
-# Create the users table if it doesn't already exist
-
-
-
-
+# Create or modify the users table
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(255) NOT NULL UNIQUE,
         password VARCHAR(255) NOT NULL,
-        bio TEXT
+        bio TEXT,
+        birth_day INT,
+        birth_month INT,
+        birth_year INT,
+        news_interests TEXT,
+        favorite_shows_movies TEXT
     )
 """)
 db.commit()
 
-# Check if the 'bio' column exists and add it if it doesn't
-cursor.execute("""
-    SELECT COUNT(*)
-    FROM information_schema.COLUMNS
-    WHERE TABLE_NAME = 'users' AND COLUMN_NAME = 'bio'
-""")
-column_exists = cursor.fetchone()[0]
+# Check if new columns exist and add if necessary
+columns_to_add = {
+    "birth_day": "INT",
+    "birth_month": "INT",
+    "birth_year": "INT",
+    "news_interests": "TEXT",
+    "favorite_shows_movies": "TEXT"
+}
 
-if not column_exists:
-    cursor.execute("ALTER TABLE users ADD COLUMN bio TEXT")
-    db.commit()
+for column, datatype in columns_to_add.items():
+    cursor.execute(f"""
+        SELECT COUNT(*)
+        FROM information_schema.COLUMNS
+        WHERE TABLE_NAME = 'users' AND COLUMN_NAME = '{column}'
+    """)
+    column_exists = cursor.fetchone()[0]
+
+    if not column_exists:
+        cursor.execute(f"ALTER TABLE users ADD COLUMN {column} {datatype}")
+        db.commit()
 
 cursor.close()
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
         password = generate_password_hash(request.form['password'])
-        bio = request.form['bio']
+        birth_day = int(request.form['birth_day'])
+        birth_month = int(request.form['birth_month'])
+        birth_year = int(request.form['birth_year'])
 
         cursor = db.cursor()
 
+        # Check if username already exists
         cursor.execute("SELECT username FROM users WHERE username = %s", (username,))
         existing_user = cursor.fetchone()
         if existing_user:
             cursor.close()
             flash("Username already exists. Please choose a different one.", "error")
-            return render_template('register.html', username=username, bio=bio)
+            return render_template('register.html', username=username)
 
-
-        cursor.execute("CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(255) UNIQUE, password VARCHAR(255), bio TEXT)")
-        cursor.execute("INSERT INTO users (username, password, bio) VALUES (%s, %s, %s)", (username, password, bio))
+        # Insert user into the database (news_interests & favorite_shows_movies left empty)
+        cursor.execute("INSERT INTO users (username, password, birth_day, birth_month, birth_year, bio, news_interests, favorite_shows_movies) VALUES (%s, %s, %s, %s, %s, '', '', '')",
+                       (username, password, birth_day, birth_month, birth_year))
         db.commit()
         cursor.close()
 
@@ -99,9 +113,12 @@ def register():
         cursor.execute(f"CREATE TABLE IF NOT EXISTS diary_{username} (id INT AUTO_INCREMENT PRIMARY KEY, entry TEXT, response TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)")
         db.commit()
         cursor.close()
+
         session['username'] = username
         return redirect(url_for('home'))
+
     return render_template('register.html')
+
 
 
 
@@ -239,14 +256,58 @@ def delete_entry(entry_id):
 
 
 
+def get_horoscope_sign(month, day):
+    zodiac_signs = [
+        ("Capricorn", (1, 1), (1, 19)),
+        ("Aquarius", (1, 20), (2, 18)),
+        ("Pisces", (2, 19), (3, 20)),
+        ("Aries", (3, 21), (4, 19)),
+        ("Taurus", (4, 20), (5, 20)),
+        ("Gemini", (5, 21), (6, 20)),
+        ("Cancer", (6, 21), (7, 22)),
+        ("Leo", (7, 23), (8, 22)),
+        ("Virgo", (8, 23), (9, 22)),
+        ("Libra", (9, 23), (10, 22)),
+        ("Scorpio", (10, 23), (11, 21)),
+        ("Sagittarius", (11, 22), (12, 21)),
+        ("Capricorn", (12, 22), (12, 31))
+    ]
+
+    for sign, start, end in zodiac_signs:
+        if (month == start[0] and day >= start[1]) or (month == end[0] and day <= end[1]):
+            return sign
+    return "Unknown"
+
+
+
+
+
 
 @app.route('/')
 def home():
     if 'username' not in session:
         return redirect(url_for('login'))
+    
+    username = session['username']
+    cursor = db.cursor()
+
+    # Fetch birth month and day for the logged-in user
+    cursor.execute("SELECT birth_month, birth_day FROM users WHERE username = %s", (username,))
+    user_data = cursor.fetchone()
+    cursor.close()
+
+
+    if not user_data or not user_data[0] or not user_data[1]:
+        flash("Please update your profile with your birth date to get your horoscope.", "warning")
+        return redirect(url_for('profile'))  # Redirect to a profile update page if missing
+
+    birth_month, birth_day = user_data
+    zodiac_sign = get_horoscope_sign(birth_month, birth_day)
+
+
     url = "https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily"
     params = {
-        'sign': 'Scorpio',  # Change 'Scorpio' to any other sign if needed
+        'sign': zodiac_sign,  # Change 'Scorpio' to any other sign if needed
         'day': 'TODAY'
     }
     response = requests.get(url, params=params)
@@ -283,17 +344,32 @@ def home():
 #TV
 
 YOUTUBE_API_KEY = os.getenv('YOUTUBE_API_KEY')
-shows = [
-        "Parks and Recreation","Brooklyn Nine-Nine","Ghost World", "Spaceballs", "But I'm a Cheerleader",
-        "Harry Potter", "Friends", "Lord of the Rings", "Wynonna Earp", "Supernatural",
-        "Call the Midwife", "The L Word", "Sex and the City", "Frasier", 
-        "Buffy the Vampire Slayer", "Clueless", "Mean Girls", "Dude, Where's My Car?", "Jennifer's Body", "Bridget Jones' Diary", "Heathers", "Imagine Me & You"
-    ]
+#shows = [
+ #       "Parks and Recreation","Brooklyn Nine-Nine","Ghost World", "Spaceballs", "But I'm a Cheerleader",
+  #      "Harry Potter", "Friends", "Lord of the Rings", "Wynonna Earp", "Supernatural",
+   #     "Call the Midwife", "The L Word", "Sex and the City", "Frasier", 
+    #    "Buffy the Vampire Slayer", "Clueless", "Mean Girls", "Dude, Where's My Car?", "Jennifer's Body", "Bridget Jones' Diary", "Heathers", "Imagine Me & You"
+    #]
+
+
 
 
 @app.route('/tv', methods=['GET', 'POST'])
 def tv():
     # Predefined list of TV shows
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    username = session['username']
+    cursor = db.cursor()
+    
+    # Fetch favorite shows from the database
+    cursor.execute("SELECT favorite_shows_movies FROM users WHERE username = %s", (username,))
+    user_data = cursor.fetchone()
+    cursor.close()
+
+    # If no data found, use default "Friends"
+    shows = user_data[0].split(";;") if user_data and user_data[0] else ["Friends"]
     
     
     # Randomly select a show
@@ -407,14 +483,26 @@ def aboutme():
     username = session['username']
     cursor = db.cursor()
 
+    cursor.execute("SELECT birth_day,birth_month,birth_year FROM users WHERE username = %s", (username,))
+    birth = cursor.fetchone()
+    db.commit()
+
     cursor.execute("SELECT bio FROM users WHERE username = %s", (username,))
     bio = cursor.fetchone()
-
     db.commit()
+
+    cursor.execute("SELECT news_interests FROM users WHERE username = %s", (username,))
+    news_interests = cursor.fetchone()
+    db.commit()
+
+    cursor.execute("SELECT favorite_shows_movies FROM users WHERE username = %s", (username,))
+    favorite_shows_movies = cursor.fetchone()
+    db.commit()
+
     cursor.close()
 
 
-    return render_template('aboutme.html', username=username,bio=bio[0])
+    return render_template('aboutme.html', username=username,bio=bio[0], day=birth[0],month=birth[1],year=birth[2], news_interests=news_interests[0], favorite_shows_movies=favorite_shows_movies[0])
 
 
 
@@ -432,6 +520,40 @@ def update_bio():
 
     
     return redirect("/aboutme")
+
+
+@app.route("/update_news", methods=["POST"])
+def update_news():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    username = session['username']
+    news_interests = request.form.get("news_interests")
+    if news_interests:
+        cursor = db.cursor()
+        cursor.execute("UPDATE users SET news_interests = %s WHERE username = %s", (news_interests, username,))
+        db.commit()
+        cursor.close()
+
+    
+    return redirect("/aboutme")
+
+
+
+@app.route("/update_shows", methods=["POST"])
+def update_shows():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    username = session['username']
+    new_shows = request.form.get("favorite_shows_movies")
+    if new_shows:
+        cursor = db.cursor()
+        cursor.execute("UPDATE users SET favorite_shows_movies = %s WHERE username = %s", (new_shows, username,))
+        db.commit()
+        cursor.close()
+
+    
+    return redirect("/aboutme")
+
 
 
 
@@ -671,7 +793,52 @@ def book_page(book_title):
 #NEWS
 #NEWS
 
-INTEREST_TOPICS = ["Celebrities","Movies","Fashion", "Animals", "Movies", "Video Games", "TV", "Fandom","Feminism"]
+#INTEREST_TOPICS = ["Celebrities","Movies","Fashion", "Animals", "Movies", "Video Games", "TV", "Fandom","Feminism"]
+
+
+
+
+
+GEMINI_API_KEY = os.getenv('API_KEY')  # Gemini API Key
+
+def generate_gemini_summary(article_summaries):
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={GEMINI_API_KEY}"
+    
+    headers = {
+        'Content-Type': 'application/json',
+    }
+    
+    prompt = f"Summarize the following news articles in a conversational way that is entertaining (but also sensitive when needed):\n{article_summaries}"
+
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {"text": prompt}
+                ]
+            }
+        ],
+        "systemInstruction": {
+            "role": "system",
+            "parts": [
+                {"text": "Give a news summary of the articles in an entertaining way. Be serious when talking about sensitive topics though."}
+            ]
+        }
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+
+    if response.status_code == 200:
+        try:
+            return response.json()['candidates'][0]['content']['parts'][0]['text']
+        except (KeyError, IndexError):
+            return "Failed to generate a summary."
+    
+    return "Error retrieving summary from Gemini."
+
+
+
+
 
 # API key and base URL
 NEWS_API_KEY = os.getenv("NEWS_API")
@@ -679,18 +846,32 @@ NEWS_API_URL = "https://newsapi.org/v2/everything"
 
 @app.route('/news')
 def news():
-    articles = []
+
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    username = session['username']
+    cursor = db.cursor()
     
-    # Fetch news for each topic individually
-    for topic in INTEREST_TOPICS:
-        # Stop fetching if we already have 10 articles
-        if len(articles) >= 10:
-            break
-        
+    # Fetch news interests from the database
+    cursor.execute("SELECT news_interests FROM users WHERE username = %s", (username,))
+    user_data = cursor.fetchone()
+    cursor.close()
+
+    # If no interests are found, default to "Politics"
+    INTEREST_TOPICS = user_data[0].split(";;") if user_data and user_data[0] else ["Politics"]
+    articles=[]
+    topic_index = 0  # Keep track of which topic to fetch next
+
+    while len(articles) < 15:
+        topic = INTEREST_TOPICS[topic_index]  # Select the current topic
+        topic_index = (topic_index + 1) % len(INTEREST_TOPICS)  # Move to next topic in round-robin
+
         params = {
-            "q": topic,  # Search for the specific topic
+            "q": topic,
             "language": "en",
-            "sortBy": "relevancy",  # Prioritize relevant results
+            "sortBy": "relevancy",
+            "pageSize": 2,
             "apiKey": NEWS_API_KEY
         }
         
@@ -699,14 +880,17 @@ def news():
         if response.status_code == 200:
             data = response.json()
             for article in data.get("articles", []):
-                # Add the article if we haven't reached 10 yet
-                if len(articles) < 20:
+                if len(articles) < 15:  # Stop once we have 10 articles
                     articles.append({
                         "title": article.get("title"),
                         "description": article.get("description"),
                         "url": article.get("url"),
                         "source": article.get("source", {}).get("name"),
+                        "topic": topic  # Store the topic for reference
                     })
+                    print (article.get("title"))
+                else:
+                    break  
     
     # Ensure no duplicate articles
     seen_urls = set()
@@ -718,9 +902,14 @@ def news():
     
     # Limit to 10 articles (in case duplicates were removed)
     curated_articles = curated_articles[:20]
+
+    article_summaries = "\n".join([f"- {article['title']}: {article['description']}" for article in curated_articles if article['description']])
+    gemini_summary = "No summary available."
+    if article_summaries:
+        gemini_summary = generate_gemini_summary(article_summaries)
     
     # Render news page with curated articles
-    return render_template('news.html', articles=curated_articles)
+    return render_template('news.html', articles=curated_articles, gemini_summary=gemini_summary)
 
 
 
