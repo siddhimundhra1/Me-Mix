@@ -41,6 +41,9 @@ db = mysql.connector.connect(
     ssl_ca="ca.pem"  # Path to the SSL certificate
 )
 
+
+
+
 cursor = db.cursor()
 
 # Create or modify the users table
@@ -137,7 +140,8 @@ def login():
             session['username'] = username
             return redirect(url_for('home'))
         else:
-            return "Invalid credentials, please try again."
+            flash("Invalid login credentials.", "error")
+            return render_template('login.html')
 
     return render_template('login.html')
 
@@ -871,7 +875,7 @@ def news():
             "q": topic,
             "language": "en",
             "sortBy": "relevancy",
-            "pageSize": 2,
+            "pageSize": 15/len(INTEREST_TOPICS),
             "apiKey": NEWS_API_KEY
         }
         
