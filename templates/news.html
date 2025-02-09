@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   
+
+    <!-- Link to External CSS -->
+    <link rel="stylesheet" href="/static/stylesheet.css">
+
+
+
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <ul>
+      <li><a href="/aboutme">About Me</a></li>
+      <li><a href="/">Home</a></li>
+      <li><a href="/music">Music</a></li>
+      <li><a href="/tv">Movies and TV</a></li>
+      <li><a href="/diary">Diary</a></li>
+      <li><a href="/books">Books</a></li>
+      <li><a href="/news">News</a></li>
+      <li><a href="/history">History</a></li>
+    </ul>
+
+    <!-- Page Header -->
+    <h1>News</h1>
+
+    
+              
+
+    <div class="carousel">
+        {% if articles %}
+        <div class="carousel-inner">
+            {% for article in articles %}
+                <div class="carousel-item{% if loop.index == 1 %} active{% endif %}">
+
+                    <h2>{{ article.title }}</h2>
+                    <p>{{ article.description }}</p>
+                    <small>Source: {{ article.source }}</small>
+                    <br>
+                    <a href="{{ article.url }}" target="_blank">Read More</a>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="carousel-buttons">
+          <button id="prev">&lt;</button>
+          <button id="next">&gt;</button>
+        </div>
+        {% else %}
+        <p>No news available for your selected topics.</p>
+        {% endif %}
+      </div>
+      <script>
+        const carouselInner = document.querySelector('.carousel-inner');
+        const items = document.querySelectorAll('.carousel-item');
+        const prevButton = document.getElementById('prev');
+        const nextButton = document.getElementById('next');
+        let currentIndex = 0;
+    
+        function updateCarousel() {
+          const offset = -currentIndex * 100;
+          carouselInner.style.transform = `translateX(${offset}%)`;
+        }
+    
+        prevButton.addEventListener('click', () => {
+          currentIndex = (currentIndex - 1 + items.length) % items.length;
+          updateCarousel();
+        });
+    
+        nextButton.addEventListener('click', () => {
+          currentIndex = (currentIndex + 1) % items.length;
+          updateCarousel();
+        });
+      </script>
+
+
+   
+
+</body>
+
+</html>
+

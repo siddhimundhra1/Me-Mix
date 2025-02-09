@@ -1,0 +1,5 @@
+# Environment variable files
+.env
+
+# Certificate files (e.g., SSL certificates)
+ca.pem

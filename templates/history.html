@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" href="/static/stylesheet.css">
+
+<head>
+  <ul>
+    <li><a href="/aboutme">About Me</a></li>
+    <li><a href="/">Home</a></li>
+    <li><a href="/music">Music</a></li>
+    <li><a href="/tv">Movies and TV</a></li>
+    <li><a href="/diary">Diary</a></li>
+    <li><a href="/books">Books</a></li>
+    <li><a href="/news">News</a></li>
+    <li><a href="/history">History</a></li>
+  </ul>
+
+  <h1>History</h1>
+</head>
+<body>
+    
+    <main>
+        <h2>Select a Decade</h2>
+        <ul>
+            {% for decade in range(1900, 2000, 10) %}
+            <li><a href="/decade/{{ decade }}">{{ decade }}s</a></li>
+            {% endfor %}
+        </ul>
+    </main>
+</body>
+</html>

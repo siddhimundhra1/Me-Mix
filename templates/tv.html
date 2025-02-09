@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+
+<html>
+
+<link rel="stylesheet" href="/static/stylesheet.css">
+
+
+<head>
+  <ul>
+    <li><a href="/aboutme">About Me</a></li>
+    <li><a href="/">Home</a></li>
+    <li><a href="/music">Music</a></li>
+    <li><a href="/tv">Movies and TV</a></li>
+    <li><a href="/diary">Diary</a></li>
+    <li><a href="/books">Books</a></li>
+    <li><a href="/news">News</a></li>
+    <li><a href="/history">History</a></li>
+  </ul>
+
+
+
+<h1>Movies/TV</h1>
+
+</head>
+
+<body>
+
+
+  <p>Here's a clip for you!</p>
+    {% if video_id %}
+        <h3>Clip from "{{ show_name }}"</h3>
+        <iframe width="560" height="315" 
+                src="https://www.youtube.com/embed/{{ video_id }}" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen>
+        </iframe>
+    {% else %}
+        <p>Sorry, no clip could be found for "{{ show_name }}".</p>
+    {% endif %}
+    
+    <form method="GET" action="/tv">
+        <button type="submit" style="padding: 10px 20px; font-size: 16px;">Pick Something Else</button>
+    </form>
+    <form action="/tv" method="POST">
+      <input type="hidden" name="show_name" value="{{ show_name }}">
+      <button type="submit" style="padding: 10px 20px; font-size: 16px;">Regenerate</button>
+  </form>
+  
+
+
+</body>
+
+</html>

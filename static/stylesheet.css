@@ -1,0 +1,186 @@
+/* General Styles */
+body {
+  background: linear-gradient(to bottom right, #ffffff, #f0f0f0); /* Light gradient for a clean modern vibe */
+  color: #333333; /* Dark text for readability */
+  font-family: 'Arial', sans-serif; /* Modern sans-serif font */
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+h1 {
+  text-align: center;
+  color: #333333; /* Dark text for a balanced look */
+  font-size: 3.5em;
+  margin: 30px 0;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+p {
+  font-family: 'Arial', sans-serif;
+  color: #444444; /* Softened dark gray for readability */
+  line-height: 1.8;
+  max-width: 750px;
+  margin: 20px auto;
+  text-align: justify;
+  border-left: 6px solid #dddddd; /* Subtle border for separation */
+  padding-left: 20px;
+  background: #ffffff; /* White for clean readability */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+  border-radius: 10px;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+p:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow on hover */
+}
+
+/* Navigation Bar */
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  background: #f9f9f9;
+  border-bottom: 3px solid #cccccc; /* Light border for subtle distinction */
+}
+
+li {
+  margin: 0 15px;
+}
+
+li a {
+  color: #333333; /* Dark text for contrast */
+  text-align: center;
+  padding: 14px 25px;
+  text-decoration: none;
+  font-size: 1.1em;
+  font-weight: 500;
+  background: #ffffff; /* Clean background */
+  border: 2px solid #cccccc; /* Light border for button effect */
+  border-radius: 8px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+}
+
+li a:hover {
+  background: #f0f0f0;
+  color: #444444;
+  transform: translateY(-5px); /* Subtle lift on hover */
+}
+
+/* Modern Buttons */
+button {
+  background: #ffffff;
+  color: #333333;
+  border: 2px solid #cccccc;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-size: 1.1em;
+  font-family: 'Arial', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+button:hover {
+  background: #cccccc;
+  color: #ffffff;
+  transform: scale(1.1); /* Slight scale on hover */
+}
+
+/* Additional Modern Heading Styles */
+h2 {
+  font-size: 2.2em;
+  color: #333333;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+/* Carousel Container */
+.carousel {
+  width: 90%;
+  max-width: 900px;
+  overflow: hidden;
+  position: relative;
+  background: #ffffff;
+  border: 3px solid #cccccc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  margin: 40px auto;
+  border-radius: 15px;
+}
+
+.carousel-inner {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.carousel-item {
+  flex: 1 0 100%;
+  padding: 30px;
+  background: #ffffff;
+  box-sizing: border-box;
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+}
+
+/* Carousel Item Hover Effects */
+.carousel-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Increased hover effect for depth */
+}
+
+.carousel-item h2 {
+  margin-bottom: 10px;
+  font-size: 1.8em;
+  color: #333333;
+}
+
+.carousel-item p {
+  font-size: 1.1em;
+  color: #555555; /* Softer gray for easy reading */
+}
+
+/* Carousel Buttons */
+.carousel-buttons {
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  transform: translateY(-50%);
+}
+
+.carousel-buttons button {
+  background: #f9f9f9;
+  color: #333333;
+  border: 2px solid #cccccc;
+  padding: 14px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.carousel-buttons button:hover {
+  background: #cccccc;
+  color: #ffffff;
+  transform: scale(1.2); /* Slight enlargement on hover */
+}
+
+/* Modern Patterns and Touches */
+.carousel-item h2,
+.carousel-item p {
+  font-family: 'Arial', sans-serif;
+}
+
+.iframe-container {
+  justify-content: center;
+  align-items: center;
+}
