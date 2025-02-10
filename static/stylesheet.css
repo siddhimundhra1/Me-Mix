@@ -167,7 +167,7 @@ button:hover {
 /* Carousel Navigation Buttons */
 .carousel-buttons {
   display: flex;
-  justify-content: space-between;
+  justify-content: end;
   position: absolute;
   top: 50%;
   width: 100%;

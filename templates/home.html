@@ -25,6 +25,95 @@
 <body>
 
 
+  <div class="carousel">
+    <h2>7-Day Weather Forecast</h2>
+    <div class="carousel-inner" id="weather-carousel">
+        <!-- Weather data will be inserted dynamically here -->
+    </div>
+    <div class="carousel-buttons">
+        <button id="prev">&lt;</button>
+        <button id="next">&gt;</button>
+    </div>
+</div>
+
+<script>
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(sendLocation, showError);
+        } else {
+            document.getElementById("weather-carousel").innerHTML = "<p>Geolocation is not supported by this browser.</p>";
+        }
+    }
+
+    function sendLocation(position) {
+        fetch('/get_weather', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById("weather-carousel").innerHTML = `<p>${data.error}</p>`;
+            } else {
+                let weatherHtml = "";
+
+                data.weather.forEach((day, index) => {
+                    weatherHtml += `
+                        <div class="carousel-item${index === 0 ? ' active' : ''}">
+                            <h3>${day.name}</h3>
+                            <img src="${day.icon}" alt="${day.shortForecast}" style="width: 80px; height: 80px;">
+                            <p>${day.temperature}</p>
+                            <p>${day.shortForecast}</p>
+                        </div>
+                    `;
+                });
+
+                document.getElementById("weather-carousel").innerHTML = weatherHtml;
+                initializeCarousel();
+            }
+        })
+        .catch(error => {
+            document.getElementById("weather-carousel").innerHTML = "<p>Weather data unavailable.</p>";
+            console.error('Error:', error);
+        });
+    }
+
+    function showError(error) {
+        document.getElementById("weather-carousel").innerHTML = "<p>Location access denied.</p>";
+    }
+
+    function initializeCarousel() {
+        const carouselInner = document.querySelector('.carousel-inner');
+        const items = document.querySelectorAll('.carousel-item');
+        const prevButton = document.getElementById('prev');
+        const nextButton = document.getElementById('next');
+        let currentIndex = 0;
+
+        function updateCarousel() {
+            const offset = -currentIndex * 100;
+            carouselInner.style.transform = `translateX(${offset}%)`;
+        }
+
+        prevButton.addEventListener('click', () => {
+            currentIndex = (currentIndex - 1 + items.length) % items.length;
+            updateCarousel();
+        });
+
+        nextButton.addEventListener('click', () => {
+            currentIndex = (currentIndex + 1) % items.length;
+            updateCarousel();
+        });
+    }
+
+    window.onload = getLocation;
+</script>
+
+
+
   <section id="horoscope">
     <h2>Horoscope</h2>
     <p>{{ horoscope }}</p>

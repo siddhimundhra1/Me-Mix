@@ -1,6 +1,6 @@
 import mysql.connector
 import os
-from flask import Flask, render_template, request, redirect, session, url_for, flash
+from flask import Flask, render_template, request, redirect, session, url_for, flash, jsonify
 import spotipy
 import time
 from spotipy.oauth2 import SpotifyOAuth
@@ -283,6 +283,52 @@ def get_horoscope_sign(month, day):
     return "Unknown"
 
 
+NWS_API_URL = "https://api.weather.gov"
+
+def get_weather(latitude, longitude):
+    """Fetch 7-day weather forecast from NWS API."""
+    points_url = f"{NWS_API_URL}/points/{latitude},{longitude}"
+    response = requests.get(points_url, headers={"User-Agent": "MyWeatherApp"})
+    
+    if response.status_code != 200:
+        return {"error": "Weather data unavailable"}
+
+    grid_data = response.json()
+    forecast_url = grid_data["properties"]["forecast"]
+
+    forecast_response = requests.get(forecast_url, headers={"User-Agent": "MyWeatherApp"})
+    
+    if forecast_response.status_code != 200:
+        return {"error": "Weather data unavailable"}
+
+    forecast_data = forecast_response.json()
+    periods = forecast_data["properties"]["periods"]
+
+    # Extract next 7 days of forecast
+    weekly_forecast = []
+    for period in periods[:14]:  # Each day has 2 periods (day & night)
+        weekly_forecast.append({
+            "name": period["name"],  # e.g., "Monday Night", "Tuesday"
+            "temperature": f"{period['temperature']}°{period['temperatureUnit']}",
+            "shortForecast": period["shortForecast"],  # e.g., "Partly Cloudy"
+            "icon": period["icon"],  # Weather icon URL
+        })
+
+    return weekly_forecast
+
+
+@app.route('/get_weather', methods=['POST'])
+def weather():
+    """Receives user's location from frontend and returns weather forecast."""
+    data = request.json
+    latitude = data.get("latitude")
+    longitude = data.get("longitude")
+
+    if not latitude or not longitude:
+        return jsonify({"error": "Invalid coordinates"}), 400
+
+    forecast = get_weather(latitude, longitude)
+    return jsonify({"weather": forecast})
 
 
 
@@ -328,7 +374,7 @@ def home():
             'img_url': comic_data.get('img'),
             'alt_text': comic_data.get('alt')
         }
-
+    
     # Render the horoscope and comic on the homepage
     return render_template('home.html', horoscope=horoscope, comic=comic)
   
@@ -608,7 +654,9 @@ def generate():
 
     # Check if the form data was received
     if not top_artists_str or not top_tracks_str:
-        return "Error: Missing form data.", 400
+        #return "Error: Missing form data.", 400
+        top_artists_str=""
+        top_tracks_str=""
 
     # Convert strings to lists
     top_artists = top_artists_str.split(', ')
@@ -1122,22 +1170,6 @@ def show_decade(decade):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #END 
 #END
 #END
@@ -1152,3 +1184,17 @@ def show_decade(decade):
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
