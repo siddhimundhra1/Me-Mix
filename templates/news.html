@@ -62,6 +62,7 @@
         function updateCarousel() {
           const offset = -currentIndex * 100;
           carouselInner.style.transform = `translateX(${offset}%)`;
+
         }
     
         prevButton.addEventListener('click', () => {
@@ -76,7 +77,7 @@
       </script>
 
 <h2>News Summary</h2>
-<p>{{ gemini_summary }}</p>
+<p>{{ gemini_summary|safe }}</p>
 
 
    

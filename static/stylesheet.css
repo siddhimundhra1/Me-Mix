@@ -1,40 +1,73 @@
 /* General Styles */
 body {
-  background: linear-gradient(to bottom right, #ffffff, #f0f0f0); /* Light gradient for a clean modern vibe */
-  color: #333333; /* Dark text for readability */
-  font-family: 'Arial', sans-serif; /* Modern sans-serif font */
+  /* Use a centered, full-cover background with a subtle dark overlay.
+     The blend mode “multiply” darkens the collage gently for an editorial feel. */
+  background: url('collage.jpg') center center/cover, #111;
+  background-blend-mode: multiply;
+  color: #EAEAEA;
+  font-family: 'Lora', serif; /* Elegant serif for body copy */
   margin: 0;
   padding: 0;
   line-height: 1.6;
 }
 
+/* Headings */
 h1 {
   text-align: center;
-  color: #333333; /* Dark text for a balanced look */
-  font-size: 3.5em;
-  margin: 30px 0;
+  color: #FFFFFF;
+  font-size: 4em;
+  margin: 40px 0;
   letter-spacing: 2px;
   text-transform: uppercase;
   font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+  padding: 10px;
+  font-family: 'Playfair Display', serif; /* Refined, classic magazine feel */
 }
 
+h2 {
+  color: #FFFFFF;
+  font-size: 3em;
+  text-transform: uppercase;
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: 1.5px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+  padding: 10px;
+  border: 1px solid #D4AF37; /* Gold accent */
+  font-family: 'Playfair Display', serif;
+}
+
+h3 {
+  color: #FFFFFF;
+  font-size: 2.2em;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin: 20px 0;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+  padding: 8px;
+  border-left: 4px solid #D4AF37; /* Gold accent for a subtle detail */
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+}
+
+/* Paragraphs */
 p {
-  font-family: 'Arial', sans-serif;
-  color: #444444; /* Softened dark gray for readability */
+  font-family: 'Lora', serif;
+  color: #F5F5F5;
   line-height: 1.8;
   max-width: 750px;
   margin: 20px auto;
   text-align: justify;
-  border-left: 6px solid #dddddd; /* Subtle border for separation */
+  border-left: 4px solid #D4AF37;
   padding-left: 20px;
-  background: #ffffff; /* White for clean readability */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
-  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
   transition: box-shadow 0.3s ease-in-out;
 }
 
 p:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Slightly stronger shadow on hover */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
 
 /* Navigation Bar */
@@ -44,74 +77,68 @@ ul {
   padding: 0;
   display: flex;
   justify-content: center;
-  background: #f9f9f9;
-  border-bottom: 3px solid #cccccc; /* Light border for subtle distinction */
+  background: rgba(0, 0, 0, 0.8);
+  border-bottom: 2px solid #D4AF37;
 }
 
 li {
-  margin: 0 15px;
+  margin: 0 20px;
 }
 
 li a {
-  color: #333333; /* Dark text for contrast */
-  text-align: center;
+  color: #FFFFFF;
   padding: 14px 25px;
+  display: block;
   text-decoration: none;
   font-size: 1.1em;
   font-weight: 500;
-  background: #ffffff; /* Clean background */
-  border: 2px solid #cccccc; /* Light border for button effect */
-  border-radius: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
   text-transform: uppercase;
   transition: all 0.3s ease;
+  font-family: 'Playfair Display', serif;
 }
 
 li a:hover {
-  background: #f0f0f0;
-  color: #444444;
-  transform: translateY(-5px); /* Subtle lift on hover */
+  background: #D4AF37;
+  color: #000;
 }
 
-/* Modern Buttons */
+/* Buttons */
 button {
-  background: #ffffff;
-  color: #333333;
-  border: 2px solid #cccccc;
+  background: transparent;
+  color: #FFFFFF;
+  border: 2px solid #D4AF37;
   padding: 12px 20px;
   border-radius: 25px;
   font-size: 1.1em;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Lora', serif;
   cursor: pointer;
   transition: all 0.3s ease;
   text-transform: uppercase;
+  margin: 20px auto;
+  display: block;
 }
 
 button:hover {
-  background: #cccccc;
-  color: #ffffff;
-  transform: scale(1.1); /* Slight scale on hover */
+  background: #D4AF37;
+  color: #000;
 }
 
-/* Additional Modern Heading Styles */
-h2 {
-  font-size: 2.2em;
-  color: #333333;
-  text-transform: uppercase;
-  margin-bottom: 15px;
-  font-weight: bold;
-}
-
-/* Carousel Container */
+/* Carousel */
 .carousel {
-  width: 90%;
+  width: 100%;
   max-width: 900px;
   overflow: hidden;
   position: relative;
-  background: #ffffff;
-  border: 3px solid #cccccc;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  /* Use a subtle diagonal gradient to evoke high-end paper texture */
+  background: linear-gradient(135deg, #1a1a1a, #2c2c2c);
+  border: 1px solid #D4AF37; /* Refined gold border */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
   margin: 40px auto;
-  border-radius: 15px;
+  border-radius: 8px;
+  padding: 10px; /* Extra padding for a balanced layout */
 }
 
 .carousel-inner {
@@ -120,35 +147,24 @@ h2 {
 }
 
 .carousel-item {
-  flex: 1 0 100%;
-  padding: 30px;
-  background: #ffffff;
+  flex: 0 0 100%;
+  padding: 40px 30px;
+  /* A deep, uniform background for news content */
+  background: #111;
+  text-align: left; /* Left-align text for readability in news stories */
+  font-family: 'Lora', serif;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-sizing: border-box;
-  text-align: center;
-  font-family: 'Arial', sans-serif;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-  transition: transform 0.3s ease;
 }
 
-/* Carousel Item Hover Effects */
 .carousel-item:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Increased hover effect for depth */
+  transform: scale(1.02); /* A very subtle scale for interactivity */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
-.carousel-item h2 {
-  margin-bottom: 10px;
-  font-size: 1.8em;
-  color: #333333;
-}
-
-.carousel-item p {
-  font-size: 1.1em;
-  color: #555555; /* Softer gray for easy reading */
-}
-
-/* Carousel Buttons */
+/* Carousel Navigation Buttons */
 .carousel-buttons {
   display: flex;
   justify-content: space-between;
@@ -159,28 +175,34 @@ h2 {
 }
 
 .carousel-buttons button {
-  background: #f9f9f9;
-  color: #333333;
-  border: 2px solid #cccccc;
-  padding: 14px;
+  background: transparent;
+  color: #D4AF37; /* Use the gold accent for a classic feel */
+  border: 1px solid #D4AF37;
+  padding: 10px;
   cursor: pointer;
   border-radius: 50%;
-  transition: all 0.3s ease;
+  font-size: 1.2em;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .carousel-buttons button:hover {
-  background: #cccccc;
-  color: #ffffff;
-  transform: scale(1.2); /* Slight enlargement on hover */
+  background: #D4AF37;
+  color: #111;
 }
 
-/* Modern Patterns and Touches */
-.carousel-item h2,
-.carousel-item p {
-  font-family: 'Arial', sans-serif;
-}
-
+/* Iframe Container */
 .iframe-container {
+  display: flex;
   justify-content: center;
   align-items: center;
+}
+
+iframe {
+  display: block;
+  margin: 0 auto;
+}
+
+img {
+  display: block;
+  margin: 0 auto;
 }

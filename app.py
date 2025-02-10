@@ -469,15 +469,24 @@ def stats():
         return redirect('/')
     
     sp = spotipy.Spotify(auth=token_info['access_token'])
-    results = sp.current_user_top_artists(limit=10, time_range='long_term')
-    top_artists = results['items']
-
-    track_results = sp.current_user_top_tracks(limit=10, time_range='long_term')
-    top_tracks = track_results['items']
     
+    # Handle errors gracefully
+    try:
+        results = sp.current_user_top_artists(limit=10, time_range='long_term')
+        top_artists = results.get('items', [])
+    except Exception as e:
+        print(f"Error fetching top artists: {e}")
+        top_artists = []
 
+    try:
+        track_results = sp.current_user_top_tracks(limit=10, time_range='long_term')
+        top_tracks = track_results.get('items', [])
+    except Exception as e:
+        print(f"Error fetching top tracks: {e}")
+        top_tracks = []
     
     return render_template('music.html', top_artists=top_artists, top_tracks=top_tracks)
+
 
 @app.route('/aboutme')
 def aboutme():
@@ -842,6 +851,15 @@ def generate_gemini_summary(article_summaries):
 
 
 
+def convert_gemini_markup(text):
+    # First convert bold (double asterisks)
+    # This regex looks for text between ** and ** (non-greedy)
+    text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
+    # Then convert italics (single asterisk)
+    # Make sure this runs after bold conversion so it doesn’t interfere with **bold**
+    text = re.sub(r'\*(.+?)\*', r'<em>\1</em>', text)
+    return text
+
 
 
 # API key and base URL
@@ -867,7 +885,7 @@ def news():
     articles=[]
     topic_index = 0  # Keep track of which topic to fetch next
 
-    while len(articles) < 15:
+    while len(articles) < 20:
         topic = INTEREST_TOPICS[topic_index]  # Select the current topic
         topic_index = (topic_index + 1) % len(INTEREST_TOPICS)  # Move to next topic in round-robin
 
@@ -884,7 +902,7 @@ def news():
         if response.status_code == 200:
             data = response.json()
             for article in data.get("articles", []):
-                if len(articles) < 15:  # Stop once we have 10 articles
+                if len(articles) < 20:  # Stop once we have 10 articles
                     articles.append({
                         "title": article.get("title"),
                         "description": article.get("description"),
@@ -910,7 +928,8 @@ def news():
     article_summaries = "\n".join([f"- {article['title']}: {article['description']}" for article in curated_articles if article['description']])
     gemini_summary = "No summary available."
     if article_summaries:
-        gemini_summary = generate_gemini_summary(article_summaries)
+        raw_summary = generate_gemini_summary(article_summaries)
+        gemini_summary = convert_gemini_markup(raw_summary)
     
     # Render news page with curated articles
     return render_template('news.html', articles=curated_articles, gemini_summary=gemini_summary)
